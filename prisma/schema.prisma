@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id          String   @id @default(cuid())
+  address     String   @unique
+  balanceWei  String   @default("0")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  deposits    Deposit[]
+  withdrawals Withdrawal[]
+  sessions    GameSession[]
+}
+
+model Deposit {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  txHash        String        @unique
+  amountWei     String
+  fromAddress   String
+  blockNumber   Int?
+  status        DepositStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
+  confirmedAt   DateTime?
+}
+
+model Withdrawal {
+  id          String           @id @default(cuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  toAddress   String
+  amountWei   String
+  txHash      String?          @unique
+  status      WithdrawalStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  sentAt      DateTime?
+}
+
+model GameSession {
+  id                String            @id @default(cuid())
+  userId            String
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  riskMode          RiskMode
+  stakeWei          String
+  sessionBalanceWei String
+  clientSeed        String
+  serverSeed        String
+  serverSeedHash    String
+  status            GameSessionStatus @default(ACTIVE)
+  tossCount         Int               @default(0)
+  winStreak         Int               @default(0)
+  lossStreak        Int               @default(0)
+  headsCount        Int               @default(0)
+  tailsCount        Int               @default(0)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  endedAt           DateTime?
+
+  tosses Toss[]
+}
+
+model Toss {
+  id               String      @id @default(cuid())
+  sessionId        String
+  session          GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  nonce            Int
+  outcome          TossOutcome
+  multiplierNum    Int
+  multiplierDen    Int
+  balanceBeforeWei String
+  balanceAfterWei  String
+  outcomeHash      String
+  createdAt        DateTime    @default(now())
+
+  @@unique([sessionId, nonce])
+}
+
+enum RiskMode {
+  SAFE
+  NORMAL
+  AGGRESSIVE
+}
+
+enum GameSessionStatus {
+  ACTIVE
+  COMPLETED
+  BUSTED
+}
+
+enum TossOutcome {
+  HEADS
+  TAILS
+}
+
+enum DepositStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum WithdrawalStatus {
+  PENDING
+  SENT
+  FAILED
+}

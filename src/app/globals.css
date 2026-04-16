@@ -1,26 +1,247 @@
 @import "tailwindcss";
 
+/* CoinFlip — dark purple + neon arcade theme */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --cf-purple-void: #0a0518;
+  --cf-purple-deep: #13082a;
+  --cf-purple-mid: #2a1452;
+  --cf-purple-light: #3d1f6b;
+  --cf-text: #f4f0ff;
+  --cf-text-muted: #a89cc8;
+  --cf-gold: #ffd700;
+  --cf-gold-mid: #ffa500;
+  --cf-neon-cyan: #22e3ff;
+  --cf-neon-magenta: #ff2d92;
+  --cf-neon-blue: #8b9cff;
+  --cf-glass: rgba(255, 255, 255, 0.06);
+  --cf-glass-border: rgba(255, 255, 255, 0.12);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-cf-void: var(--cf-purple-void);
+  --color-cf-deep: var(--cf-purple-deep);
+  --color-cf-mid: var(--cf-purple-mid);
+  --color-cf-light: var(--cf-purple-light);
+  --color-cf-text: var(--cf-text);
+  --color-cf-muted: var(--cf-text-muted);
+  --color-cf-gold: var(--cf-gold);
+  --color-cf-gold-mid: var(--cf-gold-mid);
+  --color-cf-cyan: var(--cf-neon-cyan);
+  --color-cf-magenta: var(--cf-neon-magenta);
+  --color-cf-blue: var(--cf-neon-blue);
+  --color-cf-glass: var(--cf-glass);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/** Click feedback on the 3D coin (inspired by CodePen coin demos). */
+@keyframes cf-coin-ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3.2);
+    opacity: 0;
   }
 }
 
+@keyframes cf-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-12px) rotate(8deg);
+    opacity: 0.85;
+  }
+}
+
+/* Background deco: small pseudo-random wander (paired with cf-float on parent) */
+@keyframes cf-bg-drift-0 {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate(10px, -8px) rotate(5deg);
+  }
+  66% {
+    transform: translate(-7px, 6px) rotate(-4deg);
+  }
+}
+
+@keyframes cf-bg-drift-1 {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-12px, 10px) rotate(7deg);
+  }
+}
+
+@keyframes cf-bg-drift-2 {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(8px, 12px) rotate(-6deg);
+  }
+  75% {
+    transform: translate(6px, -9px) rotate(4deg);
+  }
+}
+
+@keyframes cf-bg-drift-3 {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  40% {
+    transform: translate(-9px, -11px) rotate(8deg);
+  }
+  80% {
+    transform: translate(11px, 5px) rotate(-3deg);
+  }
+}
+
+@keyframes cf-bg-drift-4 {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  20% {
+    transform: translate(14px, 4px) rotate(-5deg);
+  }
+  60% {
+    transform: translate(-5px, -12px) rotate(6deg);
+  }
+}
+
+@keyframes cf-bg-sunburst-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0.22;
+  }
+  50% {
+    transform: translate(14px, -18px) rotate(9deg);
+    opacity: 0.3;
+  }
+}
+
+.cf-bg-sunburst {
+  animation: cf-bg-sunburst-drift 26s ease-in-out infinite;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100%;
+  color: var(--cf-text);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background: radial-gradient(
+      ellipse 90% 70% at 50% -10%,
+      var(--cf-purple-mid) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 60% 50% at 80% 100%,
+      rgba(255, 45, 146, 0.12) 0%,
+      transparent 45%
+    ),
+    radial-gradient(
+      ellipse 50% 40% at 10% 90%,
+      rgba(34, 227, 255, 0.1) 0%,
+      transparent 45%
+    ),
+    linear-gradient(180deg, var(--cf-purple-deep) 0%, var(--cf-purple-void) 55%);
+}
+
+/* Display headings — rounded, bold (Outfit via layout) */
+.font-display {
+  font-family: var(--font-display), var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Glass panels */
+.cf-panel {
+  background: var(--cf-glass);
+  border: 1px solid var(--cf-glass-border);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+}
+
+/* Primary CTA — neon cyan */
+.cf-btn-primary {
+  @apply rounded-full px-4 py-2.5 text-sm font-semibold transition-all;
+  background: linear-gradient(135deg, #2ef0ff 0%, #00c8e8 100%);
+  color: #1a0a2e;
+  box-shadow:
+    0 0 20px rgba(34, 227, 255, 0.35),
+    0 2px 0 rgba(0, 0, 0, 0.2);
+}
+.cf-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow:
+    0 0 28px rgba(34, 227, 255, 0.5),
+    0 2px 0 rgba(0, 0, 0, 0.2);
+}
+.cf-btn-primary:disabled {
+  opacity: 0.45;
+}
+
+/* Secondary CTA — magenta */
+.cf-btn-accent {
+  @apply rounded-full px-4 py-2.5 text-sm font-semibold transition-all;
+  background: linear-gradient(135deg, #ff4aa8 0%, #ff2d92 100%);
+  color: white;
+  box-shadow:
+    0 0 18px rgba(255, 45, 146, 0.35),
+    0 2px 0 rgba(0, 0, 0, 0.15);
+}
+.cf-btn-accent:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+.cf-btn-accent:disabled {
+  opacity: 0.45;
+}
+
+/* Ghost / outline */
+.cf-btn-ghost {
+  @apply rounded-full border px-4 py-2 text-sm font-medium transition-colors;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--cf-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+.cf-btn-ghost:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Inputs */
+.cf-input {
+  @apply mt-1 w-full rounded-xl border px-3 py-2 font-mono text-sm outline-none transition-colors;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(10, 5, 24, 0.65);
+  color: var(--cf-text);
+}
+.cf-input:focus {
+  border-color: rgba(34, 227, 255, 0.45);
+  box-shadow: 0 0 0 2px rgba(34, 227, 255, 0.12);
+}
+
+select.cf-input {
+  appearance: auto;
+  cursor: pointer;
+}
+
+select.cf-input option {
+  background-color: var(--cf-purple-deep);
+  color: var(--cf-text);
+}
+
+.cf-label {
+  @apply text-xs font-medium;
+  color: var(--cf-text-muted);
 }

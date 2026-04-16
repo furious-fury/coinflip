@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: coinflip
+      POSTGRES_PASSWORD: coinflip
+      POSTGRES_DB: coinflip
+    ports:
+      - "5433:5432"
+    volumes:
+      - coinflip_pg:/var/lib/postgresql/data
+
+volumes:
+  coinflip_pg:
