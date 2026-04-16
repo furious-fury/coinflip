@@ -22,6 +22,7 @@
 
 # misc
 .DS_Store
+/dev.db
 *.pem
 
 # debug
@@ -39,3 +40,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# prisma generated client (Prisma 7)
+/src/generated/prisma
+
+# Foundry — under `contracts/`: reinstall deps with `forge install`, rebuild with `forge build`
+contracts/lib/
+contracts/cache/
+contracts/out/
+
+# Local AI / IDE assistant files (not project source — keep out of git)
+AGENTS.md
+CLAUDE.md
